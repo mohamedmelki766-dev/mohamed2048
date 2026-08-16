@@ -9,7 +9,8 @@ requirements = python3,kivy
 orientation = portrait
 fullscreen = 0
 
-android.api = 33
+# أندرويد SDK و NDK المستقران
+android.api = 31
 android.minapi = 21
 android.ndk = 25b
 android.accept_sdk_license = True
