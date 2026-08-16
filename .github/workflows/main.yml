@@ -20,11 +20,12 @@ jobs:
           sudo apt-get install -y openjdk-17-jdk build-essential git ffmpeg libsdl2-dev libsdl2-image-dev libsdl2-mixer-dev libsdl2-ttf-dev libportmidi-dev libswscale-dev libavformat-dev libavcodec-dev zlib1g-dev autoconf libtool pkg-config
           pip install buildozer cython==0.29.33
 
-      - name: Auto accept SDK licenses
-        run: |
-          mkdir -p ~/.android
-          touch ~/.android/repositories.cfg
-
       - name: Build with Buildozer
         run: |
-          yes | buildozer android debug || yes | buildozer android debug
+          buildozer -v android debug
+
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: mohamed2048-apk
+          path: bin/*.apk
