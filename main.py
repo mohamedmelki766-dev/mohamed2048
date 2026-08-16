@@ -26,6 +26,37 @@ DEFAULT_COLORS = {
     2048: (0.96, 0.74, 0.90, 1),
 }
 
+class RootLayout(BoxLayout):
+    def __init__(self, app_instance, **kwargs):
+        super().__init__(**kwargs)
+        self.app = app_instance
+        self.touch_start_pos = None
+
+    def on_touch_down(self, touch):
+        if self.collide_point(*touch.pos):
+            self.touch_start_pos = touch.pos
+        return super().on_touch_down(touch)
+
+    def on_touch_up(self, touch):
+        if self.touch_start_pos:
+            dx = touch.x - self.touch_start_pos[0]
+            dy = touch.y - self.touch_start_pos[1]
+            min_swipe = 40  # المسافة الأدنى للسحب
+            
+            if abs(dx) > min_swipe or abs(dy) > min_swipe:
+                if abs(dx) > abs(dy):
+                    if dx > 0:
+                        self.app.make_move('Right')
+                    else:
+                        self.app.make_move('Left')
+                else:
+                    if dy > 0:
+                        self.app.make_move('Up')
+                    else:
+                        self.app.make_move('Down')
+            self.touch_start_pos = None
+        return super().on_touch_up(touch)
+
 class Game2048App(App):
     def build(self):
         self.title = "Mohamed's 2048"
@@ -36,7 +67,7 @@ class Game2048App(App):
         self.can_undo = False
         self.game_over = False
 
-        self.root = BoxLayout(orientation='vertical', padding=10, spacing=10)
+        self.root = RootLayout(self, orientation='vertical', padding=10, spacing=10)
         
         with self.root.canvas.before:
             Color(*DEFAULT_COLORS["bg"])
@@ -44,10 +75,10 @@ class Game2048App(App):
         self.root.bind(size=self._update_bg, pos=self._update_bg)
 
         # Header Controls
-        self.header = BoxLayout(size_hint_y=0.15, spacing=5)
+        self.header = BoxLayout(size_hint_y=0.12, spacing=5)
         
-        self.score_label = Label(text="Score: 0", font_size='16sp', bold=True, color=DEFAULT_COLORS["text"])
-        self.high_score_label = Label(text="Best: 0", font_size='16sp', bold=True, color=(0.96, 0.66, 0.50, 1))
+        self.score_label = Label(text="Score: 0", font_size='15sp', bold=True, color=DEFAULT_COLORS["text"])
+        self.high_score_label = Label(text="Best: 0", font_size='15sp', bold=True, color=(0.96, 0.66, 0.50, 1))
         
         self.btn_undo = Button(text="Undo", size_hint_x=0.2, on_press=lambda x: self.undo_move())
         self.btn_reset = Button(text="New", size_hint_x=0.2, on_press=lambda x: self.start_game())
@@ -63,7 +94,7 @@ class Game2048App(App):
         self.root.add_widget(self.header)
 
         # Board Container
-        self.board_container = BoxLayout(size_hint_y=0.85)
+        self.board_container = BoxLayout(size_hint_y=0.88)
         self.root.add_widget(self.board_container)
 
         Window.bind(on_keyboard=self.on_keyboard)
@@ -143,7 +174,6 @@ class Game2048App(App):
                     lbl.bg_rect = Rectangle(size=lbl.size, pos=lbl.pos)
 
     def on_keyboard(self, window, key, scancode, codepoint, modifier):
-        # Arrow keys or Touch swipes mapped to movement
         keys = {273: 'Up', 274: 'Down', 276: 'Left', 275: 'Right', 122: 'Up', 115: 'Down', 113: 'Left', 100: 'Right'}
         if key in keys:
             self.make_move(keys[key])
