@@ -11,3 +11,8 @@ osx.python_version = 3
 osx.kivy_version = 1.9.1
 fullscreen = 0
 android.archs = arm64-v8a
+
+android.api = 33
+android.minapi = 21
+android.build_tools_version = 30.0.3
+android.accept_sdk_license = True
