@@ -22,9 +22,12 @@ jobs:
 
       - name: Build with Buildozer
         run: |
-          buildozer android debug
-        env:
-          ACCEPT_SDK_LICENSES: "True"
+          mkdir -p ~/.android
+          touch ~/.android/repositories.cfg
+          buildozer android debug || true
+          yes | /home/runner/.buildozer/android/platform/android-sdk/cmdline-tools/latest/bin/sdkmanager --licenses || true
+          yes | /home/runner/.buildozer/android/platform/android-sdk/tools/bin/sdkmanager --licenses || true
+          buildozer -v android debug
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
